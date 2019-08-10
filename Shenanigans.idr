@@ -1,12 +1,15 @@
 module Shenanigans
 
--- "Isomorphism" = an iso between types
-record Isomorphism (a : Type) (b : Type) where
-  constructor MkIsomorphism
-  u     : a -> b -- a function from a type 'a' to a type 'b'
-  v     : b -> a -- a function from a type 'b' to a type 'a'
-  comp  : (x : a) -> (v (u x) = x)
-  comp' : (y : b) -> (u (v y) = y) -- proofs that u.v = 1 && v.u = 1
+-- "Iso" = an iso between types
+record Iso (a : Type) (b : Type) where
+  constructor MkIso
+  f     : a -> b
+  -- a function from a type 'a' to a type 'b'
+  g     : b -> a
+  -- a function from a type 'b' to a type 'a'
+  comp  : (x : a) -> (g (f x) = x)
+  comp' : (y : b) -> (f (g y) = y)
+  -- ^ proofs that u.g = 1 && v.f = 1
 
 -- the identity function
 -- equivalently: id a x = x
@@ -19,22 +22,26 @@ idIdem : (a : Type) ->
          (id a (id a x) = id a x)
 idIdem a x = Refl
 
--- Isomorphism is reflexive
-isoIsReflexive : (a : Type) -> Isomorphism a a
-isoIsReflexive a = MkIsomorphism (id a) (id a) (idIdem a) (idIdem a)
+-- Iso is reflexive
+isoIsReflexive : (a : Type) -> Iso a a
+isoIsReflexive a = MkIso (id a) (id a) (idIdem a) (idIdem a)
 
--- Isomorphism is symmetric
+-- Iso is symmetric
 isoIsSymmetric : (a : Type) ->
                  (b : Type) ->
-                 Isomorphism a b ->
-                 Isomorphism b a
-isoIsSymmetric a iso = ?hole_sym
+                 Iso a b ->
+                 Iso b a
+isoIsSymmetric a b iso = MkIso (g iso) (f iso) (comp' iso) (comp iso)
 
--- Isomorphism is transitive
+-- Iso is transitive
 isoIsTransitive : (a : Type) ->
                   (b : Type) ->
                   (c : Type) ->
-                  Isomorphism a b ->
-                  Isomorphism b c ->
-                  Isomorphism a c
-isoIsTransitive a b c iso iso' = ?hole_trn
+                  Iso a b ->
+                  Iso b c ->
+                  Iso a c
+isoIsTransitive a b c iso iso' = 
+  MkIso ((f iso') . (f iso)) 
+        ((g iso) . (g iso')) 
+        ?hole_1 
+        ?hole_2

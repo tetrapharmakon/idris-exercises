@@ -40,8 +40,20 @@ isoIsTransitive : (a : Type) ->
                   Iso a b ->
                   Iso b c ->
                   Iso a c
-isoIsTransitive a b c iso iso' = 
-  MkIso ((f iso') . (f iso)) 
-        ((g iso) . (g iso')) 
-        ?hole_1 
+isoIsTransitive a b c iso iso' =
+  MkIso ((f iso') . (f iso))
+        ((g iso) . (g iso'))
+        ?hole_1
         ?hole_2
+
+-- shall use a tactic for this ^
+{-
+  ((f iso') . (f iso)) . ((g iso) . (g iso'))
+  ------------------------------------------- [assoc]
+  f iso' . id . g iso'
+  --------------------                        [f iso' . comp . g iso']
+  f iso' . g iso'
+  ---------------                             [comp]
+  id
+  --                                          [qed]
+-}

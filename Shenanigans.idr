@@ -14,7 +14,7 @@ record Iso (a : Type) (b : Type) where
 -- the identity function
 -- equivalently: id a x = x
 id : (a : Type) -> (a -> a)
-id a = (\x => x)
+id a x = x-- (\x => x)
 
 -- proof that the identity is idempotent
 idIdem : (a : Type) ->

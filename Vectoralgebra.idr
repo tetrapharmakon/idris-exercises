@@ -1,5 +1,7 @@
 module Vectoralgebra
 
+import Data.Fin
+
 data Vec : Nat -> Type -> Type where
   Nil : Vec Z a
   (::) : a -> Vec k a -> Vec (S k) a
@@ -30,12 +32,60 @@ empties : (m : Nat) -> Matrix m 0 a
 empties Z     = []
 empties (S k) = [] :: empties k
 
-t_help : Vec m a -> Matrix m k a -> Matrix m (S k) a
-t_help xs ys = zipWith (::) xs ys
-
 transpose : {m : Nat} -> Matrix n m a -> Matrix m n a
 transpose {m} []                = empties m
 transpose {m = Z} _             = []
-transpose {m = (S k)} (x :: xs) = t_help x xs_trans
+transpose {m = (S k)} (x :: xs) = zipWith (::) x xs_trans
+-- zipWith (::) v mat appends v as first vector in the matrix mat
   where
     xs_trans = transpose xs
+
+map : (a -> b) -> Vec n a -> Vec n b
+map f [] = []
+map f (x :: y) = (f x) :: (map f y)
+
+-- insert an element a at k-th entry
+insert : a -> (k : Fin n) -> Vec n a -> Vec (S n) a
+insert _ FZ []              impossible
+insert _ (FS _) []          impossible
+insert x FZ ys            = x :: ys
+insert x (FS z) (y :: ys) = y :: insert x z ys
+
+-- delete k-th entry
+expunge : (k : Fin n) -> Vec (S n) a -> Vec n a
+expunge FZ (x :: xs)     = xs
+expunge (FS z) (x :: xs) = x :: expunge z xs
+
+-- extract k-th entry
+at : Vec n a -> (k : Fin n) -> a
+at [] FZ             impossible
+at [] (FS _)         impossible
+at (x :: y) FZ     = x
+at (x :: y) (FS z) = at y z
+
+-- update k-th entry
+updateAt : (k : Fin n) -> (f : a -> a) -> Vec n a -> Vec n a
+updateAt FZ f (x :: xs)     = f x :: xs
+updateAt (FS z) f (x :: xs) = x :: updateAt z f xs
+
+-- proof del cristodedio
+succKisKplusOne : (k : Nat) -> S k = plus k 1
+succKisKplusOne Z = Refl
+succKisKplusOne (S n) = rewrite (plusCommutative n 1) in Refl
+
+-- reverse a vector
+reverse : Vec n a -> Vec n a
+reverse {n = Z} [] = []
+reverse {n = (S k)} (x :: xs) = rewrite (succKisKplusOne k) in append (reverse xs) (x :: [])
+
+-- take the head of a vector
+head : Vec (S n) a -> a
+head (x :: y) = x
+
+-- take the tail of a vector
+tail : Vec (S n) a -> Vec n a
+tail (x :: xs) = xs
+
+-- take the last element of a vector
+last : Vec (S n) a -> a
+last vec = head (reverse vec)

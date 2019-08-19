@@ -70,13 +70,14 @@ updateAt (FS z) f (x :: xs) = x :: updateAt z f xs
 
 -- proof del cristodedio
 succKisKplusOne : (k : Nat) -> S k = plus k 1
-succKisKplusOne Z = Refl
+succKisKplusOne Z     = Refl
 succKisKplusOne (S n) = rewrite (plusCommutative n 1) in Refl
 
 -- reverse a vector
 reverse : Vec n a -> Vec n a
-reverse {n = Z} [] = []
-reverse {n = (S k)} (x :: xs) = rewrite (succKisKplusOne k) in append (reverse xs) (x :: [])
+reverse {n = Z} []            = []
+reverse {n = (S k)} (x :: xs) =
+  rewrite (succKisKplusOne k) in append (reverse xs) (x :: [])
 
 -- take the head of a vector
 head : Vec (S n) a -> a

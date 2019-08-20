@@ -10,6 +10,10 @@ append : Vec n a -> Vec m a -> Vec (n + m) a
 append [] ys        = ys
 append (x :: xs) ys = x :: append xs ys
 
+len : Vec n a -> Nat
+len [] = 0
+len (x :: xs) = 1 + len xs
+
 zipWith : (a -> b -> c) -> Vec n a -> Vec n b -> Vec n c
 zipWith f [] _                = []
 zipWith f _ []                = []
@@ -90,3 +94,22 @@ tail (x :: xs) = xs
 -- take the last element of a vector
 last : Vec (S n) a -> a
 last vec = head (reverse vec)
+
+
+-- zip two vectors
+zip : Vec n a -> Vec n b -> Vec n (a,b)
+zip [] _ = []
+zip (x :: xs) (y :: ys) = (x, y) :: zip xs ys
+
+-- take the longest initial segment of a vector satisfying p
+takeWhile : (a -> Bool) -> Vec n a -> (k ** Vec k a)
+takeWhile p [] = (0 ** [])
+takeWhile p (x :: xs) with (takeWhile p xs)
+  | ( _ ** xs' ) = if (p x) then ( _ ** x :: xs') else ( _ ** xs' )
+
+-- take 2 [1,2,3,4] = [1,2]
+-- but take 5 [1,2,3,4] fails: lovely!
+take : (n : Nat) -> Vec (n + m) a -> Vec n a
+take Z [] = []
+take Z (x :: xs) = []
+take (S k) (x :: xs) = x :: take k xs

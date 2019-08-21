@@ -136,3 +136,19 @@ interleave : {n : Nat} -> Vec n a -> Vec n a -> Vec (n+n) a
 interleave {n=Z} [] _                  = []
 interleave {n=S k} (x :: xs) (y :: ys) =
   x :: rewrite (KSKissKK k) in (y :: interleave xs ys)
+
+filter' : (p : a -> Bool) -> Vec n a -> (k ** Vec k a)
+filter' p []                         = (0 ** [])
+filter' p (x :: xs)
+  with (filter' p xs) | ( _ ** xs' ) = if (p x) then ( _ ** x :: xs') else ( _ ** xs')
+
+replicate' : (n : Nat) -> a -> Vec n a
+replicate' Z _ = []
+replicate' (S k) x = x :: replicate' k x
+
+unzip' : Vec n (a,b) -> (Vec n a, Vec n b)
+unzip' [] = ([],[])
+unzip' ((u,v) :: xs) with (unzip' xs) | go = (u :: fst go , v :: snd go)
+
+-- unzipZip : (uncurry zip) (unzip' u) = u
+-- unzipZip = ?unzipZip_rhs

@@ -77,21 +77,26 @@ succKisKplusOne : (k : Nat) -> S k = plus k 1
 succKisKplusOne Z     = Refl
 succKisKplusOne (S n) = rewrite (plusCommutative n 1) in Refl
 
+-- snd proof del cristodedio
+nPlusnIsTwoN : (k : Nat) -> S (k + k) = k + (S k)
+nPlusnIsTwoN Z = Refl
+nPlusnIsTwoN (S k) = ?something
+
 -- reverse a vector
 reverse : Vec n a -> Vec n a
 reverse {n = Z} []            = []
 reverse {n = (S k)} (x :: xs) =
   rewrite (succKisKplusOne k) in append (reverse xs) (x :: [])
 
--- take the head of a vector
+-- take' the head of a vector
 head : Vec (S n) a -> a
 head (x :: y) = x
 
--- take the tail of a vector
+-- take' the tail of a vector
 tail : Vec (S n) a -> Vec n a
 tail (x :: xs) = xs
 
--- take the last element of a vector
+-- take' the last element of a vector
 last : Vec (S n) a -> a
 last vec = head (reverse vec)
 
@@ -101,15 +106,42 @@ zip : Vec n a -> Vec n b -> Vec n (a,b)
 zip [] _ = []
 zip (x :: xs) (y :: ys) = (x, y) :: zip xs ys
 
--- take the longest initial segment of a vector satisfying p
+-- take' the longest initial segment of a vector satisfying p
 takeWhile : (a -> Bool) -> Vec n a -> (k ** Vec k a)
 takeWhile p [] = (0 ** [])
 takeWhile p (x :: xs) with (takeWhile p xs)
   | ( _ ** xs' ) = if (p x) then ( _ ** x :: xs') else ( _ ** xs' )
 
--- take 2 [1,2,3,4] = [1,2]
--- but take 5 [1,2,3,4] fails: lovely!
-take : (n : Nat) -> Vec (n + m) a -> Vec n a
-take Z [] = []
-take Z (x :: xs) = []
-take (S k) (x :: xs) = x :: take k xs
+-- take' 2 [1,2,3,4] = [1,2]
+-- but take' 5 [1,2,3,4] fails: lovely!
+take' : (n : Nat) -> Vec (n + m) a -> Vec n a
+take' Z [] = []
+take' Z (x :: xs) = []
+take' (S k) (x :: xs) = x :: take' k xs
+
+splitAt' : (n : Nat) -> Vec (n+m) a -> (Vec n a, Vec m a)
+splitAt' Z [] = ([], [])
+splitAt' Z ys = ([], ys)
+splitAt' (S k) (y::ys) with (splitAt' k ys)
+  | (u,v) = (y :: u, v)
+
+splitWorks1 : splitAt' 3 [0,1,2,3,4,5,6,7] = ([0,1,2], [3,4,5,6,7])
+splitWorks1 = Refl
+
+
+takeWorks1 : take' 3 [0,1,2,3,4,5,6,7] = [0,1,2]
+takeWorks1 = Refl
+
+interleave : {n : Nat} -> Vec n a -> Vec n a -> Vec (n+n) a
+interleave {n=Z} [] _ = ?interleave_rhs_3
+interleave {n=S k} (x :: xs) (y :: ys) = rewrite (nPlusnIsTwoN k) in x :: y :: interleave xs ys
+
+---------- Proofs ----------
+
+Vectoralgebra.something = proof
+  intros
+  rewrite nPlusnIsTwoN k
+  rewrite plusCommutative (S (S k)) k
+  trivial
+
+

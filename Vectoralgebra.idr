@@ -80,7 +80,7 @@ succKisKplusOne (S n) = rewrite (plusCommutative n 1) in Refl
 -- snd proof del cristodedio
 nPlusnIsTwoN : (k : Nat) -> S (k + k) = k + (S k)
 nPlusnIsTwoN Z = Refl
-nPlusnIsTwoN (S k) = ?something
+nPlusnIsTwoN (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
 
 -- reverse a vector
 reverse : Vec n a -> Vec n a
@@ -133,15 +133,5 @@ takeWorks1 : take' 3 [0,1,2,3,4,5,6,7] = [0,1,2]
 takeWorks1 = Refl
 
 interleave : {n : Nat} -> Vec n a -> Vec n a -> Vec (n+n) a
-interleave {n=Z} [] _ = ?interleave_rhs_3
-interleave {n=S k} (x :: xs) (y :: ys) = rewrite (nPlusnIsTwoN k) in x :: y :: interleave xs ys
-
----------- Proofs ----------
-
-Vectoralgebra.something = proof
-  intros
-  rewrite nPlusnIsTwoN k
-  rewrite plusCommutative (S (S k)) k
-  trivial
-
-
+interleave {n=Z} [] _ = []
+interleave {n=S k} (x :: xs) (y :: ys) = ?wellshit

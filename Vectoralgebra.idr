@@ -132,9 +132,9 @@ sKKisKSK : (k : Nat) -> S (k + k) = k + (S k)
 sKKisKSK Z = Refl
 sKKisKSK (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
 
-sKKisKSK1 : (k : Nat) -> k + (S k) = S (k + k)
-sKKisKSK1 Z = Refl
-sKKisKSK1 (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
+KSKissKK : (k : Nat) -> k + (S k) = S (k + k)
+KSKissKK Z = Refl
+KSKissKK (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
 
 -- proofWeNeed : (k : Nat) -> S (plus k (S k)) = plus (S k) (S k)
 -- proofWeNeed Z = Refl
@@ -142,4 +142,4 @@ sKKisKSK1 (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
 
 interleave : {n : Nat} -> Vec n a -> Vec n a -> Vec (n+n) a
 interleave {n=Z} [] _ = []
-interleave {n=S k} (x :: xs) (y :: ys) = x :: rewrite (sKKisKSK1 k) in (y :: interleave xs ys)
+interleave {n=S k} (x :: xs) (y :: ys) = x :: rewrite (KSKissKK k) in (y :: interleave xs ys)

@@ -77,7 +77,7 @@ succKisKplusOne : (k : Nat) -> S k = plus k 1
 succKisKplusOne Z     = Refl
 succKisKplusOne (S n) = rewrite (plusCommutative n 1) in Refl
 
--- snd proof del cristodedio
+-- snd proof del cristodedio, there's no need to even write this, i think
 nPlusnIsTwoN : (k : Nat) -> S (k + k) = k + (S k)
 nPlusnIsTwoN Z = Refl
 nPlusnIsTwoN (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
@@ -134,4 +134,4 @@ takeWorks1 = Refl
 
 interleave : {n : Nat} -> Vec n a -> Vec n a -> Vec (n+n) a
 interleave {n=Z} [] _ = []
-interleave {n=S k} (x :: xs) (y :: ys) = ?wellshit
+interleave {n=S k} (x :: xs) (y :: ys) = rewrite ?wellshit in x :: y :: interleave xs ys

@@ -96,9 +96,9 @@ last : Vec (S n) a -> a
 last vec = head (reverse vec)
 
 -- zip two vectors
-zip : Vec n a -> Vec n b -> Vec n (a,b)
-zip [] _ = []
-zip (x :: xs) (y :: ys) = (x, y) :: zip xs ys
+zip' : Vec n a -> Vec n b -> Vec n (a,b)
+zip' [] _ = []
+zip' (x :: xs) (y :: ys) = (x, y) :: zip' xs ys
 
 -- take the longest initial segment of a vector satisfying p
 -- note the use of dependent sum ** : you can not tell how long
@@ -150,5 +150,10 @@ unzip' : Vec n (a,b) -> (Vec n a, Vec n b)
 unzip' [] = ([],[])
 unzip' ((u,v) :: xs) with (unzip' xs) | go = (u :: fst go , v :: snd go)
 
--- unzipZip : (uncurry zip) (unzip' u) = u
--- unzipZip = ?unzipZip_rhs
+-- proof that unzip \circ zip = id using rewriting!
+unzipZip : (u : Vec n a) -> (v : Vec n b) -> unzip' (zip' u v) = (u,v)
+unzipZip [] [] = Refl
+unzipZip (x :: xs) (y :: ys) = rewrite (unzipZip xs ys) in Refl
+
+-- proof that zip \circ unzip = id, yet to come...
+-- zipUnzip : (x : Vec n (a,b)) -> zip' (unzip' x) = x

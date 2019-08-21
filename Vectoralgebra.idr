@@ -127,11 +127,14 @@ splitWorks1 = Refl
 takeWorks1 : take' 3 [0,1,2,3,4,5,6,7] = [0,1,2]
 takeWorks1 = Refl
 
-
 -- snd proof del cristodedio, there's no need to even write this, i think
 sKKisKSK : (k : Nat) -> S (k + k) = k + (S k)
 sKKisKSK Z = Refl
 sKKisKSK (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
+
+sKKisKSK1 : (k : Nat) -> k + (S k) = S (k + k)
+sKKisKSK1 Z = Refl
+sKKisKSK1 (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
 
 -- proofWeNeed : (k : Nat) -> S (plus k (S k)) = plus (S k) (S k)
 -- proofWeNeed Z = Refl
@@ -139,4 +142,4 @@ sKKisKSK (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
 
 interleave : {n : Nat} -> Vec n a -> Vec n a -> Vec (n+n) a
 interleave {n=Z} [] _ = []
-interleave {n=S k} (x :: xs) (y :: ys) with (y :: interleave xs ys) | tail = x :: tail
+interleave {n=S k} (x :: xs) (y :: ys) = x :: rewrite (sKKisKSK1 k) in (y :: interleave xs ys)

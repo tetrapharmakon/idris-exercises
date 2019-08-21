@@ -1,7 +1,5 @@
 module ProofMonoid
 
-%runElab
-
 import Interfaces.Verified
 
 data Option a = Some a | None

@@ -77,11 +77,6 @@ succKisKplusOne : (k : Nat) -> S k = plus k 1
 succKisKplusOne Z     = Refl
 succKisKplusOne (S n) = rewrite (plusCommutative n 1) in Refl
 
--- snd proof del cristodedio, there's no need to even write this, i think
-nPlusnIsTwoN : (k : Nat) -> S (k + k) = k + (S k)
-nPlusnIsTwoN Z = Refl
-nPlusnIsTwoN (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
-
 -- reverse a vector
 reverse : Vec n a -> Vec n a
 reverse {n = Z} []            = []
@@ -132,6 +127,16 @@ splitWorks1 = Refl
 takeWorks1 : take' 3 [0,1,2,3,4,5,6,7] = [0,1,2]
 takeWorks1 = Refl
 
+
+-- snd proof del cristodedio, there's no need to even write this, i think
+sKKisKSK : (k : Nat) -> S (k + k) = k + (S k)
+sKKisKSK Z = Refl
+sKKisKSK (S k) = rewrite (plusSuccRightSucc (S k) (S k)) in Refl
+
+-- proofWeNeed : (k : Nat) -> S (plus k (S k)) = plus (S k) (S k)
+-- proofWeNeed Z = Refl
+-- proofWeNeed (S k) = Refl
+
 interleave : {n : Nat} -> Vec n a -> Vec n a -> Vec (n+n) a
 interleave {n=Z} [] _ = []
-interleave {n=S k} (x :: xs) (y :: ys) = rewrite ?wellshit in x :: y :: interleave xs ys
+interleave {n=S k} (x :: xs) (y :: ys) with (y :: interleave xs ys) | tail = x :: tail

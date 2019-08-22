@@ -154,5 +154,7 @@ unzipZip : (u : Vec n a) -> (v : Vec n b) -> unzip' (zip' u v) = (u,v)
 unzipZip [] [] = Refl
 unzipZip (x :: xs) (y :: ys) = rewrite (unzipZip xs ys) in Refl
 
--- proof that zip \circ unzip = id, yet to come...
--- zipUnzip : (x : Vec n (a,b)) -> zip' (unzip' x) = x
+-- proof that zip \circ unzip = id
+zipUnzip : (x : Vec n (a,b)) -> zip' (fst $ unzip' x) (snd $ unzip' x) = x
+zipUnzip [] = Refl
+zipUnzip ((x,y) :: xs) = cong $ zipUnzip xs

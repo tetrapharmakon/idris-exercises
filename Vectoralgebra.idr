@@ -96,7 +96,7 @@ last : Vec (S n) a -> a
 last vec = head (reverse vec)
 
 -- zip two vectors
-zip' : Vec n a -> Vec n b -> Vec n (a,b)
+zip' : Vec n a -> Vec n b -> Vec n (a, b)
 zip' [] _ = []
 zip' (x :: xs) (y :: ys) = (x, y) :: zip' xs ys
 
@@ -111,7 +111,7 @@ splitAt' : (n : Nat) -> Vec (n+m) a -> (Vec n a, Vec m a)
 splitAt' Z []                  = ([], [])
 splitAt' Z ys                  = ([], ys)
 splitAt' (S k) (y::ys)
-  with (splitAt' k ys) | (u,v) = (y :: u, v)
+  with (splitAt' k ys) | (u, v) = (y :: u, v)
 
 -- snd proof del cristodedio
 sKKisKSK : (k : Nat) -> S (k + k) = k + (S k)
@@ -145,16 +145,32 @@ replicate' : (n : Nat) -> a -> Vec n a
 replicate' Z _ = []
 replicate' (S k) x = x :: replicate' k x
 
-unzip' : Vec n (a,b) -> (Vec n a, Vec n b)
-unzip' [] = ([],[])
-unzip' ((u,v) :: xs) with (unzip' xs) | go = (u :: fst go , v :: snd go)
+unzip' : Vec n (a, b) -> (Vec n a, Vec n b)
+unzip' [] = ([], [])
+unzip' ((u, v) :: xs) with (unzip' xs) | go = (u :: fst go, v :: snd go)
 
 -- proof that unzip \circ zip = id using rewriting!
-unzipZip : (u : Vec n a) -> (v : Vec n b) -> unzip' (zip' u v) = (u,v)
+unzipZip : (u : Vec n a) -> (v : Vec n b) -> unzip' (zip' u v) = (u, v)
 unzipZip [] [] = Refl
 unzipZip (x :: xs) (y :: ys) = rewrite (unzipZip xs ys) in Refl
 
 -- proof that zip \circ unzip = id
 zipUnzip : (x : Vec n (a,b)) -> zip' (fst $ unzip' x) (snd $ unzip' x) = x
 zipUnzip [] = Refl
-zipUnzip ((x,y) :: xs) = cong $ zipUnzip xs
+zipUnzip ((l, r) :: xs) = cong $ zipUnzip xs
+
+-- that's pointless
+twist : (a, b) -> (b, a)
+twist (l, r) = (r, l)
+
+twistVec : Vec n (a, b) -> Vec n (b, a)
+twistVec [] = []
+twistVec (x :: xs) = twist x :: twistVec xs
+
+-- proof that twist and twistVec are involutions
+twistIsInv: (x : (a, b)) -> twist (twist x) = x
+twistIsInv (l, r) = Refl
+
+twistVecIsInv : (x : Vec n (a, b)) -> twistVec (twistVec x) = x
+twistVecIsInv [] = Refl
+twistVecIsInv ((l, r) :: xs) = cong $ twistVecIsInv xs

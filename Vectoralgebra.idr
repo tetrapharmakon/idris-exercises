@@ -100,16 +100,6 @@ zip' : Vec n a -> Vec n b -> Vec n (a,b)
 zip' [] _ = []
 zip' (x :: xs) (y :: ys) = (x, y) :: zip' xs ys
 
--- take the longest initial segment of a vector satisfying p
--- note the use of dependent sum ** : you can not tell how long
--- the resulting vector will be.
-takeWhile : (a -> Bool) -> Vec n a -> (k ** Vec k a)
-takeWhile p []                         = (0 ** [])
-takeWhile p (x :: xs)
-  with (takeWhile p xs) | ( _ ** xs' ) = if (p x)
-                                         then ( _ ** x :: xs')
-                                         else ( _ ** xs' )
-
 -- take' 2 [1,2,3,4] = [1,2]
 -- but take' 5 [1,2,3,4] fails: lovely!
 take' : (n : Nat) -> Vec (n + m) a -> Vec n a
@@ -137,10 +127,19 @@ interleave {n=Z} [] _                  = []
 interleave {n=S k} (x :: xs) (y :: ys) =
   x :: rewrite (KSKissKK k) in (y :: interleave xs ys)
 
-filter' : (p : a -> Bool) -> Vec n a -> (k ** Vec k a)
+-- These two functions do the same thing, the second one doesn't work as explained in the comment
+filter' : (a -> Bool) -> Vec n a -> (k ** Vec k a)
 filter' p []                         = (0 ** [])
 filter' p (x :: xs)
   with (filter' p xs) | ( _ ** xs' ) = if (p x) then ( _ ** x :: xs') else ( _ ** xs')
+
+---- take the longest initial segment of a vector satisfying p
+---- note the use of dependent sum ** : you can not tell how long
+---- the resulting vector will be.
+--takeWhile : (a -> Bool) -> Vec n a -> (k ** Vec k a)
+--takeWhile p []                         = (0 ** [])
+--takeWhile p (x :: xs)
+--  with (takeWhile p xs) | ( _ ** xs' ) = if (p x) then ( _ ** x :: xs') else ( _ ** xs' )
 
 replicate' : (n : Nat) -> a -> Vec n a
 replicate' Z _ = []

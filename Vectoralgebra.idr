@@ -32,6 +32,10 @@ Matrix n m a = Vec n (Vec m a)
 --                 | rows |
 --                        | columns
 
+sum : Num a => Vec n a -> a
+sum [] = 0
+sum (x :: xs) = x + sum xs
+
 empties : (m : Nat) -> Matrix m 0 a
 empties Z     = []
 empties (S k) = [] :: empties k
@@ -96,9 +100,9 @@ last : Vec (S n) a -> a
 last vec = head (reverse vec)
 
 -- zip two vectors
-zip' : Vec n a -> Vec n b -> Vec n (a,b)
-zip' [] _ = []
-zip' (x :: xs) (y :: ys) = (x, y) :: zip' xs ys
+zeep : Vec n a -> Vec n b -> Vec n (a,b)
+zeep [] _ = []
+zeep (x :: xs) (y :: ys) = (x, y) :: zeep xs ys
 
 -- take the longest initial segment of a vector satisfying p
 -- note the use of dependent sum ** : you can not tell how long
@@ -108,7 +112,7 @@ takeWhile p []                         = (0 ** [])
 takeWhile p (x :: xs)
   with (takeWhile p xs) | ( _ ** xs' ) = if (p x)
                                          then ( _ ** x :: xs')
-                                         else ( _ ** xs' )
+                                         else ( 0 ** [] )
 
 -- take' 2 [1,2,3,4] = [1,2]
 -- but take' 5 [1,2,3,4] fails: lovely!
@@ -146,14 +150,48 @@ replicate' : (n : Nat) -> a -> Vec n a
 replicate' Z _ = []
 replicate' (S k) x = x :: replicate' k x
 
-unzip' : Vec n (a,b) -> (Vec n a, Vec n b)
-unzip' [] = ([],[])
-unzip' ((u,v) :: xs) with (unzip' xs) | go = (u :: fst go , v :: snd go)
+unzeep : Vec n (a,b) -> (Vec n a, Vec n b)
+unzeep [] = ([],[])
+unzeep ((u,v) :: xs) with (unzeep xs) | go = (u :: fst go , v :: snd go)
 
 -- proof that unzip \circ zip = id using rewriting!
-unzipZip : (u : Vec n a) -> (v : Vec n b) -> unzip' (zip' u v) = (u,v)
+unzipZip : (u : Vec n a) ->
+           (v : Vec n b) ->
+           unzeep (zeep u v) = (u,v)
 unzipZip [] [] = Refl
-unzipZip (x :: xs) (y :: ys) = rewrite (unzipZip xs ys) in Refl
+unzipZip (x :: xs) (y :: ys) =
+  rewrite (unzipZip xs ys) in Refl
 
 -- proof that zip \circ unzip = id, yet to come...
--- zipUnzip : (x : Vec n (a,b)) -> zip' (unzip' x) = x
+zipUnzip : (x : Vec n (a,b))
+  -> zeep (fst $ unzeep x)
+               (snd $ unzeep x) = x
+zipUnzip [] = Refl
+zipUnzip ((x,y) :: xs) =
+  cong {f=(::) (x,y)} $ zipUnzip xs
+
+find : 	(p : a -> Bool) -> (xs : Vec n a) -> Maybe a
+find p [] = Nothing
+find p (x :: xs) = if (p x) then Just x else find p xs
+
+koncat : List (List a) -> List a
+koncat [] = []
+koncat [[x]] = [x]
+koncat (u :: us) = u ++ koncat us
+
+addMatrix : Num a => Matrix n m a -> Matrix n m a -> Matrix n m a
+addMatrix [] [] = []
+addMatrix (x :: xs) (y :: ys) = zipWith (+) x y :: addMatrix xs ys
+
+helperino : Num a => Vec n a -> Vec n a -> a
+helperino v w = sum $ zipWith (*) v w
+
+mulMatrix : Num a => Matrix n m a -> Matrix m p a -> Matrix n p a
+mulMatrix [] _ = []
+mulMatrix (x :: xs) [] = ?h1
+mulMatrix as bs =  [[f (as `at` i) (bs' `at` j) | j <- [0..lb]] | i <- [0..la]]
+  where
+    bs' = transpose bs
+    la = length as - 1
+    lb = length (head bs) - 1
+    f x y = sum $ zipWith (*) x y

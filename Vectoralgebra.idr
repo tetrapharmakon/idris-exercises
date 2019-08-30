@@ -100,7 +100,6 @@ last : Vec (S n) a -> a
 last vec = head (reverse vec)
 
 -- zip two vectors
-<<<<<<< HEAD
 zeep : Vec n a -> Vec n b -> Vec n (a,b)
 zeep [] _ = []
 zeep (x :: xs) (y :: ys) = (x, y) :: zeep xs ys
@@ -164,29 +163,21 @@ replicate' : (n : Nat) -> a -> Vec n a
 replicate' Z _ = []
 replicate' (S k) x = x :: replicate' k x
 
-<<<<<<< HEAD
 unzeep : Vec n (a,b) -> (Vec n a, Vec n b)
 unzeep [] = ([],[])
 unzeep ((u,v) :: xs) with (unzeep xs) | go = (u :: fst go , v :: snd go)
 
--- proof that unzip \circ zip = id using rewriting!
-unzipZip : (u : Vec n a) ->
-           (v : Vec n b) ->
-           unzeep (zeep u v) = (u,v)
-=======
 unzip' : Vec n (a, b) -> (Vec n a, Vec n b)
 unzip' [] = ([], [])
 unzip' ((u, v) :: xs) with (unzip' xs) | go = (u :: fst go, v :: snd go)
 
 -- proof that unzip \circ zip = id using rewriting!
 unzipZip : (u : Vec n a) -> (v : Vec n b) -> unzip' (zip' u v) = (u, v)
->>>>>>> dc9fabe99ffe059ad37b8a404e7ce2e493e2b1a9
 unzipZip [] [] = Refl
 unzipZip (x :: xs) (y :: ys) =
   rewrite (unzipZip xs ys) in Refl
 
-<<<<<<< HEAD
--- proof that zip \circ unzip = id, yet to come...
+-- proof that zip \circ unzip = id
 zipUnzip : (x : Vec n (a,b))
   -> zeep (fst $ unzeep x)
                (snd $ unzeep x) = x
@@ -207,23 +198,17 @@ addMatrix : Num a => Matrix n m a -> Matrix n m a -> Matrix n m a
 addMatrix [] [] = []
 addMatrix (x :: xs) (y :: ys) = zipWith (+) x y :: addMatrix xs ys
 
-helperino : Num a => Vec n a -> Vec n a -> a
-helperino v w = sum $ zipWith (*) v w
+helper : Num a => Vec n a -> Vec n a -> a
+helper v w = sum $ zipWith (*) v w
 
 mulMatrix : Num a => Matrix n m a -> Matrix m p a -> Matrix n p a
 mulMatrix [] _ = []
 mulMatrix (x :: xs) [] = ?h1
-mulMatrix as bs =  [[f (as `at` i) (bs' `at` j) | j <- [0..lb]] | i <- [0..la]]
+mulMatrix as bs = [ [helper (as `at` i) (bs' `at` j) | j <- [0..lb]] | i <- [0..la] ]
   where
     bs' = transpose bs
     la = length as - 1
     lb = length (head bs) - 1
-    f x y = sum $ zipWith (*) x y
-=======
--- proof that zip \circ unzip = id
-zipUnzip : (x : Vec n (a,b)) -> zip' (fst $ unzip' x) (snd $ unzip' x) = x
-zipUnzip [] = Refl
-zipUnzip ((l, r) :: xs) = cong $ zipUnzip xs
 
 -- that's pointless
 twist : (a, b) -> (b, a)
@@ -240,4 +225,3 @@ twistIsInv (l, r) = Refl
 twistVecIsInv : (x : Vec n (a, b)) -> twistVec (twistVec x) = x
 twistVecIsInv [] = Refl
 twistVecIsInv ((l, r) :: xs) = cong $ twistVecIsInv xs
->>>>>>> dc9fabe99ffe059ad37b8a404e7ce2e493e2b1a9

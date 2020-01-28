@@ -1,0 +1,4 @@
+module Talfp1
+
+main : IO ()
+main = putStrLn "Hello, Taltech!"
